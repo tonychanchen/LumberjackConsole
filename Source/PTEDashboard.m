@@ -303,6 +303,7 @@ static PTEDashboard * _sharedDashboard;
 
 
 @interface PTERootController : UIViewController
+@property (weak, nonatomic) IBOutlet UIButton *toggleBt;
 @property (nonatomic, strong) IBOutlet UITableView *tableView;
 @end
 
@@ -317,6 +318,20 @@ static PTEDashboard * _sharedDashboard;
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.tableView dataSource];
+    
+    //检测摇晃
+    UIAccelerometer *accelerometer = [UIAccelerometer sharedAccelerometer];
+    accelerometer.delegate = self;
+    accelerometer.updateInterval = 1.0f / 60.0f;
 }
 
+- (void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration {
+
+    if(fabsf(acceleration.x)>3.0||fabsf(acceleration.y>3.0)||fabsf(acceleration.z)>3.0)
+    {
+        //NSLog(@"检测到晃动");
+        [NSObject cancelPreviousPerformRequestsWithTarget:[PTEDashboard sharedDashboard]];
+        [[PTEDashboard sharedDashboard] performSelector:@selector(toggleFullscreen:) withObject:self.toggleBt afterDelay:0.3];
+    }
+}
 @end
